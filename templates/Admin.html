@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        /* Global Styles */
+        body {
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: #0f3460;
+            padding: 20px;
+            height: 100vh;
+            box-shadow: 3px 0 5px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar ul li {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+            color: white;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        .sidebar ul li:hover,
+        .sidebar ul li.active {
+            background: #e94560;
+            transform: scale(1.05);
+        }
+
+        .logout-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            font-size: 16px;
+            background-color: #d32f2f;
+            transition: background-color 0.3s ease;
+            text-align: left;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .logout-btn:hover {
+            background-color: #b71c1c;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 270px;
+            padding: 40px;
+            flex: 1;
+            transition: all 0.3s ease;
+        }
+
+        header h1 {
+            font-size: 26px;
+            text-align: center;
+            color: #e94560;
+        }
+
+        /* Page Content */
+        .page {
+            display: none;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        table th, table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+            color: white;
+        }
+
+        table th {
+            background-color: #0f3460;
+            color: white;
+        }
+
+        table tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        table tr:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        table td img {
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Button Styles */
+        .access-btn, .delete-btn, .delete-all-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .access-btn {
+            background-color: #e94560;
+        }
+
+        .access-btn.active {
+            background-color: #4CAF50;
+        }
+
+        .delete-btn, .delete-all-btn {
+            background-color: #e94560;
+        }
+
+        .delete-btn:hover, .delete-all-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .watch-video-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            font-size: 14px;
+            background-color: #4CAF50;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .watch-video-btn:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        /* Form Styles */
+        #upload-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        #file-input {
+            padding: 10px;
+            border: 2px solid #e94560;
+            border-radius: 5px;
+            background: #16213e;
+            color: white;
+            margin-bottom: 20px;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        #upload-form button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #e94560;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #upload-form button:hover {
+            background: #d32f2f;
+        }
+
+        #upload-message {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        /* Spinner Styles */
+        .spinner {
+            display: none;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #e94560;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-top: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .close-modal {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 20px;
+        cursor: pointer;
+    }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .sidebar ul li {
+                display: inline-block;
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            table th, table td {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+
+            .access-btn, .delete-btn, .delete-all-btn {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+
+            #file-input {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar ul li {
+                font-size: 12px;
+                padding: 8px;
+            }
+
+            .main-content {
+                padding: 10px;
+            }
+
+            table th, table td {
+                padding: 5px 8px;
+                font-size: 10px;
+            }
+
+            .access-btn, .delete-btn, .delete-all-btn {
+                padding: 3px 8px;
+                font-size: 10px;
+            }
+
+            #file-input {
+                width: 100%;
+            }
+        }
+    </style>
+
+    
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <ul>
+            <li class="active" onclick="showPage('approve-students', this)">Approve Students</li>
+            <li onclick="showPage('upload-exam', this)">Upload Exam</li>
+            <li onclick="showPage('invigilation', this)">Invigilation</li>
+            <li onclick="showPage('student-status', this)">Student Status</li>
+            <li onclick="showPage('exam-result', this)">Exam Result</li>
+        </ul>
+        <button class="logout-btn" id="logout-btn">Logout</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header>
+            <h1>Welcome, Admin</h1>
+        </header>
+
+        <div id="approve-students" class="page active">
+            <h2>Approve Students</h2>
+            <p>Manage student approvals here.</p>
+            <table id="students-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Photograph</th>
+                        <th>Access</th>
+                        <th>Exam Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="upload-exam" class="page">
+            <h2>Upload Exam</h2>
+            <p>Upload and schedule exams.</p>
+            <form id="upload-form" enctype="multipart/form-data">
+                <input type="file" id="file-input" accept=".xlsx, .xls" />
+                <div class="button-group">
+                    <button type="submit">Exam Upload</button>
+                    <button type="button" id="delete-all-btn" class="delete-all-btn">Delete Exam</button>
+                </div>
+            </form>
+            <div class="spinner" id="spinner"></div>
+            <p id="upload-message"></p>
+        </div>
+
+        <div id="invigilation" class="page">
+            <h2>Invigilation</h2>
+            <p>Monitor exam invigilation.</p>
+        
+            <table id="invigilationTable" border="1">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Video</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                fetch('/get_invigilation_data')
+                    .then(response => response.json())
+                    .then(data => {
+                        const tableBody = document.querySelector("#invigilationTable tbody");
+                        tableBody.innerHTML = ""; // Clear existing rows
+        
+                        data.forEach(row => {
+                            const cleanPath = row.video_path.replace(/\\/g, '/'); 
+                            const filename = cleanPath.split('/').pop(); 
+                            const videoUrl = `/uploads/invigilation/${decodeURIComponent(filename)}`;
+        
+                            const tr = document.createElement("tr");
+                            tr.innerHTML = `
+                                <td>${row.name}</td>
+                                <td>${row.username}</td>
+                                <td>${row.email}</td>
+                                <td>
+                                    <button class="watch-video-btn" data-video="${videoUrl}">Watch Video</button>
+                                </td>
+                            `;
+                            tableBody.appendChild(tr);
+                        });
+        
+                        // Add event listener to each button to open modal
+                        document.querySelectorAll(".watch-video-btn").forEach(button => {
+                            button.addEventListener("click", function () {
+                                const videoUrl = this.getAttribute("data-video");
+                                document.querySelector("#videoModal video").src = videoUrl;
+                                document.querySelector("#videoModal").style.display = "block";
+                            });
+                        });
+        
+                        // Close modal when clicking on close button
+                        document.querySelector(".close-modal").addEventListener("click", function () {
+                            document.querySelector("#videoModal video").src = ""; // Stop video playback
+                            document.querySelector("#videoModal").style.display = "none";
+                        });
+                    })
+                    .catch(error => console.error("Error fetching invigilation data:", error));
+            });
+        </script>
+<!-- Modal -->
+<div id="videoModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <video controls width="600">
+            <source src="" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+</div>
+        
+        
+<div id="student-status" class="page">
+    <h2>Student Status</h2>
+    <p>Check student status and progress.</p>
+   
+    <!-- Add a spinner next to the "Reminders To All" button -->
+    <button id="remindAllBtn">
+        Reminders To All
+        <span id="bulk-reminder-spinner" class="spinner">⏳</span>
+    </button>
+    
+    <style>
+        #remindAllBtn {
+            background-color: #0f3460;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    
+        #remindAllBtn:hover {
+            background-color: #1c5d99;
+            transform: scale(1.05);
+        }
+    
+        #bulk-reminder-spinner {
+            display: none;
+            font-size: 18px;
+        }
+    
+        #remindAllBtn.loading {
+            background-color: #4CAF50;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+    </style>
+    
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetchStudentData();
+
+        document.getElementById("remindAllBtn").addEventListener("click", function () {
+            sendBulkReminders();
+        });
+    });
+
+    function sendBulkReminders() {
+        const spinner = document.getElementById("bulk-reminder-spinner");
+        spinner.style.display = "inline-block"; // Show spinner
+
+        fetch('/send_bulk_exam_reminders', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ students: [] }) // Adjust logic if needed
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                // Fetch updated reminder counts
+                return fetch('/get_student_reminders');
+            } else {
+                throw new Error(`Failed to send reminders: ${data.message}`);
+            }
+        })
+        .then(response => response.json())
+        .then(updateData => {
+            if (updateData.status === "success") {
+                updateData.students.forEach(student => {
+                    const reminderCell = document.querySelector(`button[data-email="${student.username}"]`)
+                        ?.closest("tr")
+                        ?.querySelector(".reminder-count");
+                    if (reminderCell) {
+                        reminderCell.textContent = student.reminder;
+                    }
+                });
+
+                showPopup("Reminders sent to all students who haven't taken the exam.");
+            } else {
+                throw new Error(`Failed to fetch updated reminders: ${updateData.message}`);
+            }
+        })
+        .catch(error => {
+            showPopup(error.message || "An error occurred while sending bulk reminders.");
+            console.error("Error:", error);
+        })
+        .finally(() => {
+            spinner.style.display = "none"; // Hide spinner after completion
+        });
+    }
+
+    function showPopup(message) {
+        const popup = document.createElement("div");
+        popup.textContent = message;
+        popup.style.position = "fixed";
+        popup.style.top = "50%";
+        popup.style.left = "50%";
+        popup.style.transform = "translate(-50%, -50%)";
+        popup.style.backgroundColor = "#4CAF50";
+        popup.style.color = "white";
+        popup.style.padding = "15px 20px";
+        popup.style.borderRadius = "5px";
+        popup.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+        popup.style.zIndex = "1000";
+
+        document.body.appendChild(popup);
+
+        setTimeout(() => {
+            popup.remove();
+        }, 3000);
+    }
+</script>
+
+    <table id="studentStatusTable" border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Photograph</th>
+                <th>Exam Status</th>
+                <th>Reminders</th> <!-- New Column -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be inserted dynamically -->
+        </tbody>
+    </table>
+</div>
+
+<style>
+    #studentStatusTable {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    #studentStatusTable th, #studentStatusTable td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+
+    #studentStatusTable th {
+        background-color: #0f3460;
+        color: white;
+    }
+
+    .photo {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #ddd;
+    }
+
+    .not-taken-btn {
+        background-color: red;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .spinner {
+        display: none;
+        position: absolute;
+        right: -30px;
+        top: 5px;
+    }
+</style>
+
+
+
+
+
+<script>
+  
+
+    function fetchStudentData() {
+        fetch('/get_student_status')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.querySelector("#studentStatusTable tbody");
+                tableBody.innerHTML = "";
+
+                data.forEach(row => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${row.name}</td>
+                        <td>${row.username}</td>
+                        <td>${row.email}</td>
+                        <td><img src="${row.photograph}" width="50" height="50"></td>
+                        <td>
+                            <button class="not-taken-btn" 
+                                    data-email="${row.email}" 
+                                    data-name="${row.name}" 
+                                    data-username="${row.username}" 
+                                    data-reminder-count="${row.reminder}"
+                                    style="position: relative;">
+                                Not Taken
+                                <span class="spinner" style="display: none;">⏳</span>
+                            </button>
+                        </td>
+                        <td class="reminder-count">${row.reminder}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+
+                attachReminderEventListeners();
+            })
+            .catch(error => console.error("Error fetching student data:", error));
+    }
+
+    function attachReminderEventListeners() {
+        document.querySelectorAll(".not-taken-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const email = this.getAttribute("data-email");
+                const name = this.getAttribute("data-name");
+                const username = this.getAttribute("data-username");
+                const reminderCell = this.closest("tr").querySelector(".reminder-count");
+
+                const spinner = this.querySelector(".spinner");
+                spinner.style.display = "inline-block";  // Show spinner
+
+                fetch('/send_exam_reminder', {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, name, username })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    spinner.style.display = "none";  // Hide spinner
+
+                    if (data.status === "success") {
+                        let currentReminders = parseInt(reminderCell.textContent, 10) || 0;
+                        reminderCell.textContent = currentReminders + 1; // Increment count
+                        showPopup(`Email sent successfully to ${username}!`);
+                    } else {
+                        showPopup(`Failed to send email: ${data.message}`);
+                    }
+                })
+                .catch(error => {
+                    spinner.style.display = "none";
+                    showPopup("An error occurred. Please try again.");
+                    console.error("Error:", error);
+                });
+            });
+        });
+    }
+
+   
+    function showPopup(message) {
+        const popup = document.createElement("div");
+        popup.textContent = message;
+        popup.style.position = "fixed";
+        popup.style.top = "50%";
+        popup.style.left = "50%";
+        popup.style.transform = "translate(-50%, -50%)";
+        popup.style.backgroundColor = "#4CAF50";
+        popup.style.color = "white";
+        popup.style.padding = "15px 20px";
+        popup.style.borderRadius = "5px";
+        popup.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+        popup.style.zIndex = "1000";
+
+        document.body.appendChild(popup);
+
+        setTimeout(() => {
+            popup.remove();
+        }, 3000);
+    }
+</script>
+
+
+    
+    
+
+<div id="exam-result" class="page">
+    <h2>Exam Result</h2>
+    <p>Manage exam results.</p>
+
+    <table id="examResultsTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Marks</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+    <button id="refreshDataBtn">Calculate Result</button>
+    <button id="sendresult">Send Result</button>
+
+</div>
+
+<!-- Spinner (Initially Hidden) -->
+<!-- Spinner (Initially Hidden) -->
+<div id="spinner2" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8); padding: 20px; border-radius: 8px; text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+    
+    <div class="loader"></div>
+    <p style="color: white; margin-top: 10px; font-size: 18px;">Sending results...</p>
+</div>
+
+<style>
+/* Spinner Animation */
+.loader {
+    border: 6px solid #f3f3f3; /* Light grey */
+    border-top: 6px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+
+
+<!-- Success/Error Popup Modal -->
+<div id="popup2" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    padding: 20px; background: white; border: 1px solid #ccc; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);">
+    <p id="popup-message2" style="color: #000;"></p>
+    <button onclick="closePopup()">OK</button>
+</div>
+
+<script>
+document.getElementById("sendresult").addEventListener("click", function() {
+    let spinner2 = document.getElementById("spinner2");
+    let popup2 = document.getElementById("popup2");
+    let popupMessage2 = document.getElementById("popup-message2");
+
+    // Show Spinner
+    spinner2.style.display = "block";
+
+    fetch("/send_exam_results", { method: "POST" })
+    .then(response => response.json())
+    .then(data => {
+        spinner2.style.display = "none"; // Hide Spinner
+        popupMessage2.textContent = data.message; // Show success message
+        popup2.style.display = "block"; // Show popup
+    })
+    .catch(error => {
+        spinner2.style.display = "none"; // Hide Spinner
+        popupMessage2.textContent = "Error: " + error.message; // Show error message
+        popup2.style.display = "block"; // Show popup
+    });
+});
+
+// Function to Close the Popup
+function closePopup() {
+    document.getElementById("popup2").style.display = "none";
+}
+</script>
+
+<script>
+document.getElementById("refreshDataBtn").addEventListener("click", function() {
+    fetch("/update_exam_results", {
+        method: "POST"
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.message);
+        alert("Exam results updated successfully!");
+        location.reload();  // Refresh the page to show updated marks
+    })
+    .catch(error => console.error("Error updating exam results:", error));
+});
+</script>
+
+
+
+<style>
+    #examResultsTable {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    #examResultsTable th, #examResultsTable td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    #examResultsTable th {
+        background-color: #0f3460;
+        color: white;
+    }
+
+    #examResultsTable tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    button {
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: #0f3460;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    button:hover {
+        background-color: #1f487e;
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    fetchExamResults();
+});
+
+function fetchExamResults() {
+    fetch("/fetch_exam_results")  // Adjust if your Django API URL is different
+    .then(response => response.json())
+    .then(data => {
+        let tableBody = document.querySelector("#examResultsTable tbody");
+        tableBody.innerHTML = ""; // Clear old data
+
+        data.exam_results.forEach(record => {
+            let row = `
+                <tr>
+                    <td>${record.name}</td>
+                    <td>${record.username}</td>
+                    <td>${record.email}</td>
+                    <td>${record.marks !== null ? record.marks : 'Not Graded'}</td>
+                </tr>
+            `;
+            tableBody.innerHTML += row;
+        });
+    })
+    .catch(error => console.error("Error fetching exam results:", error));
+}
+</script>
+
+    </div>
+
+    <!-- Modal for Enlarged Image -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="img01" style="width: 100%; border-radius: 10px;">
+        </div>
+    </div>
+
+    <div id="popupModal" class="modal" >
+        <div class="modal-content" style="margin-top:10%">
+            <span class="close">&times;</span>
+            <p id="popup-message"></p>
+        </div>
+    </div>
+
+    <script>
+        function showPage(pageId, element) {
+            // Hide all pages
+            document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+            document.getElementById(pageId).classList.add("active");
+
+            // Remove active class from all menu items
+            document.querySelectorAll(".sidebar ul li").forEach(item => item.classList.remove("active"));
+
+            // Add active class to clicked menu item
+            element.classList.add("active");
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/api/admin/students')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#students-table tbody');
+                    tableBody.innerHTML = '';
+                    data.forEach(student => {
+                        fetch(`/api/admin/students/${student.username}/exam_status`)
+                            .then(response => response.json())
+                            .then(statusData => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${student.username}</td>
+                                    <td>${student.name}</td>
+                                    <td>${student.email}</td>
+                                    <td><img src="/${student.photo}" alt="Photo" width="50" class="student-photo"></td>
+                                    <td>
+                                        <button class="access-btn ${student.access === 'ACTIVE' ? 'active' : ''}" data-username="${student.username}">
+                                            ${student.access}
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <span class="exam-status ${statusData.exam_status === 'Taken' ? 'taken' : ''}" data-username="${student.username}" data-email="${student.email}">
+                                            ${statusData.exam_status}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="delete-btn" data-username="${student.username}">Delete</button>
+                                    </td>
+                                `;
+                                tableBody.appendChild(row);
+
+                                document.querySelectorAll('.access-btn').forEach(button => {
+                                    button.addEventListener('click', function() {
+                                        const username = this.dataset.username;
+                                        const currentAccess = this.textContent;
+                                        const newAccess = currentAccess === 'DISABLED' ? 'ACTIVE' : 'DISABLED';
+                                        fetch(`/api/admin/students/${username}/access`, {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({ access: newAccess })
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.status === 'success') {
+                                                this.textContent = newAccess;
+                                                this.classList.toggle('active');
+                                                this.style.backgroundColor = newAccess === 'DISABLED' ? '#e94560' : '#4CAF50';
+                                            }
+                                        });
+                                    });
+                                });
+
+                                document.querySelectorAll('.delete-btn').forEach(button => {
+                                    button.addEventListener('click', function() {
+                                        const username = this.dataset.username;
+                                        fetch(`/api/admin/students/${username}`, {
+                                            method: 'DELETE'
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.status === 'success') {
+                                                this.closest('tr').remove();
+                                            }
+                                        });
+                                    });
+                                });
+
+                                document.querySelectorAll('.exam-status.taken').forEach(status => {
+                                    status.addEventListener('click', function() {
+                                        const username = this.dataset.username;
+                                        const email = this.dataset.email;
+                                        fetch(`/api/admin/students/${username}/exam_result`, {
+                                            method: 'DELETE',
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({ email: email })
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.status === 'success') {
+                                                this.textContent = 'Not Taken';
+                                                this.classList.remove('taken');
+                                            }
+                                        });
+                                    });
+                                });
+
+                                // Modal functionality
+                                const modal = document.getElementById("imageModal");
+                                const modalImg = document.getElementById("img01");
+                                const closeModal = document.getElementsByClassName("close")[0];
+
+                                document.querySelectorAll('.student-photo').forEach(img => {
+                                    img.addEventListener('click', function() {
+                                        modal.style.display = "block";
+                                        modalImg.src = this.src;
+                                    });
+                                });
+
+                                closeModal.onclick = function() {
+                                    modal.style.display = "none";
+                                };
+                            });
+                    });
+                });
+
+            document.getElementById('upload-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const fileInput = document.getElementById('file-input');
+                const file = fileInput.files[0];
+                const message = document.getElementById('upload-message');
+                const spinner = document.getElementById('spinner');
+                const popupModal = document.getElementById('popupModal');
+                const popupMessage = document.getElementById('popup-message');
+                const closeModal = document.getElementsByClassName('close')[1];
+
+                if (!file) {
+                    message.textContent = 'Please select a file.';
+                    message.style.color = 'red';
+                    return;
+                }
+
+                const allowedExtensions = /(\.xlsx|\.xls)$/i;
+                if (!allowedExtensions.exec(file.name)) {
+                    message.textContent = 'Invalid file type. Please upload an Excel file.';
+                    message.style.color = 'red';
+                    fileInput.value = '';
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('file', file);
+
+                spinner.style.display = 'block';
+
+                fetch('/upload_exam', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    spinner.style.display = 'none';
+                    popupMessage.textContent = data.message;
+                    popupMessage.style.color = data.status === 'success' ? 'green' : 'red';
+                    popupModal.style.display = 'block';
+                })
+                .catch(error => {
+                    spinner.style.display = 'none';
+                    popupMessage.textContent = 'An error occurred. Please try again.';
+                    popupMessage.style.color = 'red';
+                    popupModal.style.display = 'block';
+                });
+
+                closeModal.onclick = function() {
+                    popupModal.style.display = 'none';
+                   // location.reload();
+                    showPage('upload-exam', document.querySelector("li[onclick='showPage(\"upload-exam\", this)']"));
+                };
+
+                window.onclick = function(event) {
+                    if (event.target == popupModal) {
+                        popupModal.style.display = 'none';
+                      //  location.reload();
+                        showPage('upload-exam', document.querySelector("li[onclick='showPage(\"upload-exam\", this)']"));
+                    }
+                };
+            });
+
+            document.getElementById('delete-all-btn').addEventListener('click', function() {
+                const spinner = document.getElementById('spinner');
+                const popupModal = document.getElementById('popupModal');
+                const popupMessage = document.getElementById('popup-message');
+                const closeModal = document.getElementsByClassName('close')[1];
+
+                spinner.style.display = 'block';
+
+                fetch('/delete_exam_records', {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    spinner.style.display = 'none';
+                    popupMessage.textContent = data.message;
+                    popupMessage.style.color = data.status === 'success' ? 'green' : 'red';
+                    popupModal.style.display = 'block';
+                })
+                .catch(error => {
+                    spinner.style.display = 'none';
+                    popupMessage.textContent = 'An error occurred. Please try again.';
+                    popupMessage.style.color = 'red';
+                    popupModal.style.display = 'block';
+                });
+
+                closeModal.onclick = function() {
+                    popupModal.style.display = 'none';
+                    location.reload();
+                    showPage('upload-exam', document.querySelector("li[onclick='showPage(\"upload-exam\", this)']"));
+                };
+
+                window.onclick = function(event) {
+                    if (event.target == popupModal) {
+                        popupModal.style.display = 'none';
+                        location.reload();
+                        showPage('upload-exam', document.querySelector("li[onclick='showPage(\"upload-exam\", this)']"));
+                    }
+                };
+            });
+
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                fetch('/admin_logout', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.href = '/';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

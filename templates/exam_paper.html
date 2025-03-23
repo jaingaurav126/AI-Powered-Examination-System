@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Paper</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .profile-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #e94560;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        .profile-card {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            text-align: left;
+            position: absolute;
+            top: 80px;
+            left: 10px;
+            width: 220px;
+            background-color: #e94560;
+            font-size: small;
+        }
+        .profile-card p {
+            margin: 10px 0;
+        }
+        .exam-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            width: 100%;
+            margin-bottom: 20px;
+            position: relative;
+            text-align: left;
+        }
+        .exam-form h2 {
+            color: #e94560;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .question p {
+            margin: 0;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            margin-top: 10px;
+        }
+        .options label {
+            margin-bottom: 5px;
+        }
+        .submit-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+        }
+        .submit-btn:hover {
+            background: #45a049;
+        }
+        .error {
+            border: 2px solid red;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            border-radius: 10px;
+            color: black;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .confirm-btn, .logout-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+        }
+        .confirm-btn:hover, .logout-btn:hover {
+            background: #45a049;
+        }
+        .video-frame {
+            width: 100%;
+            max-width: 800px;
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+            margin-bottom: 20px;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .profile-photo {
+                width: 50px;
+                height: 50px;
+                top: 10px;
+                left: 10px;
+            }
+            .profile-card {
+                width: 200px;
+                top: 70px;
+                left: 10px;
+            }
+            .video-frame {
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-photo {
+                width: 40px;
+                height: 40px;
+                top: 10px;
+                left: 10px;
+            }
+            .profile-card {
+                width: 180px;
+                top: 60px;
+                left: 10px;
+            }
+            .video-frame {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <img src="{{ profile.photo }}" alt="Profile Photo" class="profile-photo" onclick="toggleProfileCard()">
+    <div class="profile-card" id="profile-card">
+        <p><strong>Name:</strong> {{ profile.name }}</p>
+        <p><strong>Date of Birth:</strong> {{ profile.dob }}</p>
+        <p><strong>Father Name:</strong> {{ profile.Father_Name }}</p>
+        <p><strong>Email:</strong> {{ profile.email }}</p>
+        <p><strong>Address:</strong> {{ profile.address }}</p>
+    </div>
+    <div class="video-frame">
+        <video id="video" autoplay></video>
+    </div>
+    <form class="exam-form" id="exam-form">
+        <h2>Exam Paper</h2>
+        {% for question in questions %}
+        <div class="question" id="question_{{ question[0] }}">
+            <p><strong>{{ question[0] }}. {{ question[1] }}</strong></p>
+            <div class="options">
+                <label><input type="radio" name="question_{{ question[0] }}" value="a"> {{ question[2] }}</label>
+                <label><input type="radio" name="question_{{ question[0] }}" value="b"> {{ question[3] }}</label>
+                <label><input type="radio" name="question_{{ question[0] }}" value="c"> {{ question[4] }}</label>
+                <label><input type="radio" name="question_{{ question[0] }}" value="d"> {{ question[5] }}</label>
+            </div>
+        </div>
+        {% endfor %}
+        <button type="submit" class="submit-btn">Submit Result</button>
+    </form>
+
+    <div id="thankYouModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <p id="modal-message"></p>
+            <button class="confirm-btn" id="confirm-btn" onclick="confirmSubmission()" style="display: none;">Confirm</button>
+            <button class="logout-btn" id="logout-btn" onclick="logout()" style="display: none;"></button>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
+    <script>
+        let mediaRecorder;
+        let socket;
+        let recordedChunks = []; // Add this at the top
+
+
+        function toggleProfileCard() {
+            const profileCard = document.getElementById('profile-card');
+            profileCard.style.display = profileCard.style.display === 'block' ? 'none' : 'block';
+        }
+
+        document.getElementById('exam-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const form = event.target;
+            let allAnswered = true;
+            const questions = document.querySelectorAll('.question');
+            questions.forEach(question => {
+                const options = question.querySelectorAll('input[type="radio"]');
+                const answered = Array.from(options).some(option => option.checked);
+                if (!answered) {
+                    allAnswered = false;
+                    question.classList.add('error');
+                } else {
+                    question.classList.remove('error');
+                }
+            });
+
+            const modalMessage = document.getElementById('modal-message');
+            const confirmBtn = document.getElementById('confirm-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            if (allAnswered) {
+                modalMessage.textContent = 'Are you sure you want to submit?';
+                confirmBtn.style.display = 'block';
+                logoutBtn.style.display = 'none';
+                document.getElementById('thankYouModal').style.display = 'block';
+            } else {
+                modalMessage.textContent = 'Please attempt all the questions before submitting.';
+                confirmBtn.style.display = 'none';
+                logoutBtn.style.display = 'none';
+                document.getElementById('thankYouModal').style.display = 'block';
+            }
+        });
+
+        function confirmSubmission() {
+            const form = document.getElementById('exam-form');
+            const formData = new FormData(form);
+            fetch('/submit_exam', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const modalMessage = document.getElementById('modal-message');
+                    const confirmBtn = document.getElementById('confirm-btn');
+                    const logoutBtn = document.getElementById('logout-btn');
+                    modalMessage.textContent = 'Thank you for submitting the exam!';
+                    confirmBtn.style.display = 'none';
+                    logoutBtn.style.display = 'block';
+                    stopRecording();
+                    setTimeout(() => {
+                        closeModal();
+                        logout();
+                    }, 2000);
+                }
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('thankYouModal').style.display = 'none';
+        }
+
+        function logout() {
+            fetch('/admin_logout', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.href = '/';
+                }
+            });
+        }
+
+        function startRecording(stream) {
+    socket = io.connect(window.location.origin + "/ws/video");
+
+    socket.on("connect", function () {
+        console.log("WebSocket connected");
+
+        mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm; codecs=vp8" });
+
+        mediaRecorder.ondataavailable = function (event) {
+            if (event.data.size > 0) {
+                recordedChunks.push(event.data); // Store chunks
+                socket.emit("video_chunk", event.data);
+            }
+        };
+
+        mediaRecorder.start(1000); // Send data every second
+    });
+}
+
+
+        function stopRecording() {
+    mediaRecorder.onstop = function () {
+        let videoBlob = new Blob(recordedChunks, { type: "video/webm" });
+        uploadVideo(videoBlob);
+    };
+    mediaRecorder.stop();
+    socket.close();
+}
+
+
+
+        navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } })
+            .then(stream => {
+                document.getElementById('video').srcObject = stream;
+                startRecording(stream);
+            })
+            .catch(error => {
+                console.error("Error accessing camera: ", error);
+            });
+
+
+    // Assuming you have recorded video data as a Blob
+    function uploadVideo(videoBlob) {
+    let formData = new FormData();
+    formData.append("video", videoBlob);
+
+    fetch("/save_invigilation_video", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => console.log("Server Response:", data))
+    .catch(error => console.error("Error uploading video:", error));
+}
+
+    </script>
+</body>
+</html>

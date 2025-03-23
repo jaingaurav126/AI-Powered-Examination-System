@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Exam</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .profile-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #e94560;
+            position: absolute;
+            top: 10px;
+            right: 290px;
+        }
+        .profile-card {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            text-align: left;
+            position: absolute;
+            top: 10px;
+            right: 0px;
+            width: 220px;
+            background-color: #e94560;
+            font-size: small;
+        }
+        .profile-card p {
+            margin: 10px 0;
+        }
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            width: 100%;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .instructions h2 {
+            color: #e94560;
+            margin-bottom: 20px;
+        }
+        .pdf-viewer {
+            width: 100%;
+            height: 500px;
+            border: none;
+            border-radius: 10px;
+        }
+        .ready-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        .ready-btn:hover {
+            background: #45a049;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .profile-photo {
+                width: 50px;
+                height: 50px;
+                top: 10px;
+                right: 10px;
+            }
+            .profile-card {
+                width: 200px;
+                top: 70px;
+                right: 10px;
+            }
+            .pdf-viewer {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-photo {
+                width: 40px;
+                height: 40px;
+                top: 10px;
+                right: 10px;
+            }
+            .profile-card {
+                width: 180px;
+                top: 60px;
+                right: 10px;
+            }
+            .pdf-viewer {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions">
+        <button class="ready-btn" onclick="startExam()">Ready</button>
+        <h2>Exam Instructions</h2>
+        <iframe class="pdf-viewer" src="/instructions_pdf"></iframe>
+    </div>
+    <img src="{{ profile.photo }}" alt="Profile Photo" class="profile-photo" onclick="toggleProfileCard()">
+    <div class="profile-card" id="profile-card">
+        <p><strong>Name:</strong> {{ profile.name }}</p>
+        <p><strong>Date of Birth:</strong> {{ profile.dob }}</p>
+        <p><strong>Father Name:</strong> {{ profile.Father_Name }}</p>
+        <p><strong>Email:</strong> {{ profile.email }}</p>
+        <p><strong>Address:</strong> {{ profile.address }}</p>
+    </div>
+
+    <script>
+        function toggleProfileCard() {
+            const profileCard = document.getElementById('profile-card');
+            profileCard.style.display = profileCard.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function startExam() {
+            // Redirect to the exam paper page
+            window.location.href = '/exam_paper';
+        }
+    </script>
+</body>
+</html>

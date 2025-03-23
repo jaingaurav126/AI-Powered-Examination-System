@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        body {
+            background: linear-gradient(45deg, #ff6b6b, #6b6bff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            animation: fadeInDown 1.5s;
+        }
+        .options {
+            display: flex;
+            gap: 20px;
+        }
+        .button {
+            padding: 15px 30px;
+            border: none;
+            font-size: 1.5rem;
+            color: white;
+            background: #4CAF50;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+        .button:hover {
+            background: #45a049;
+            transform: scale(1.1);
+        }
+        .footer {
+            margin-top: 50px;
+            color: white;
+            font-size: 1.2rem;
+            animation: fadeInUp 2s;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 1000;
+            width: 80%;
+            max-width: 400px;
+            animation: fadeIn 0.5s;
+            box-sizing: border-box;
+        }
+        .popup .close-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5em;
+            color: #333;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .popup .close-icon:hover {
+            color: #e64a19;
+        }
+        .popup .input-box {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        .popup .signin-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s;
+            font-size: 1em;
+            margin-top: 10px;
+        }
+        .popup .signin-btn:hover {
+            background: #45a049;
+            transform: scale(1.05);
+        }
+        .popup .error-message {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .options {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .button {
+                width: 100%;
+                font-size: 1.2rem;
+                padding: 10px;
+            }
+            .popup {
+                width: 90%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="animate__animated animate__bounce">Welcome to the Exam Portal</h1>
+    <div class="options">
+        <button class="button animate__animated animate__pulse animate__infinite" onclick="location.href='/student_login'">Student</button>
+        <button class="button animate__animated animate__pulse animate__infinite" onclick="showAdminPopup()">Admin</button>
+    </div>
+    <p class="footer">Students can take exams here with ease!</p>
+
+    <div class="popup" id="admin-popup">
+        <span class="close-icon" onclick="closeAdminPopup()">&#10006;</span>
+        <h2>Admin Login</h2>
+        <input type="text" id="admin-username" class="input-box" placeholder="Username">
+        <input type="password" id="admin-password" class="input-box" placeholder="Password">
+        <button class="signin-btn" onclick="adminSignIn()">Sign In</button>
+        <p class="error-message" id="admin-error-message">Incorrect username or password!</p>
+    </div>
+    <div class="overlay" id="admin-overlay"></div>
+
+    <script>
+        function showAdminPopup() {
+            document.getElementById('admin-popup').style.display = 'block';
+            document.getElementById('admin-overlay').style.display = 'block';
+        }
+
+        function closeAdminPopup() {
+            document.getElementById('admin-popup').style.display = 'none';
+            document.getElementById('admin-overlay').style.display = 'none';
+        }
+
+        function adminSignIn() {
+            let username = document.getElementById('admin-username').value;
+            let password = document.getElementById('admin-password').value;
+
+            fetch('/admin_login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: username, password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    window.location.href = '/admin';
+                } else {
+                    document.getElementById('admin-error-message').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        }
+    </script>
+</body>
+</html>
